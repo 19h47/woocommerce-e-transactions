@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: E-Transactions
- * Plugin URI:        https://github.com/19h47/captainwild-woocommerce-e-transactions/
+ * Plugin URI:        https://github.com/19h47/woocommerce-e-transactions
  * Description: E-Transactions gateway payment plugins for WooCommerce
  * Version: 0.9.9.9.1
  * Author: 19h47
@@ -12,21 +12,9 @@
  * @since 0.9.0
  */
 
-// Ensure not called directly
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
-	$previousET = ( in_array( 'woocommerce-etransactions/woocommerce-etransactions.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) );
-if ( is_multisite() ) {
-	// //Si multisite
-	$previousET = ( array_key_exists(
-		'woocommerce-etransactions/woocommerce-etransactions.php',
-		apply_filters( 'active_plugins', get_site_option( 'active_sitewide_plugins' ) )
-	) );
-}
-if ( $previousET ) {
-	die( "Une version pr&eacute;c&eacute;dente du plugin E-Transactions est d&eacute;j&agrave; install&eacute;e. veuillez la d&eacute;sactiver avant d'activer celle-ci." );
+// If this file is called directly, abort.
+if ( ! defined( 'WPINC' ) ) {
+	die();
 }
 
 function wooCommerceActiveETwp() {
@@ -61,7 +49,7 @@ function wc_etransactions_installation() {
 		$sql       = "CREATE TABLE $tableName (
 			 id int not null auto_increment,
 			 order_id bigint not null,
-			 type enum('capture', 'first_payment', 'second_payment', 'third_payment') not null,
+			 type enum('capture', 'first_payment', 'second_payment', 'third_payment', 'fourth_payment') not null,
 			 data varchar(2048) not null,
 			 KEY order_id (order_id),
 			 PRIMARY KEY  (id))";
@@ -99,7 +87,7 @@ function wc_etransactions_initialization() {
 		$crypto->generateKey();
 	}
 
-	if ( get_site_option( WC_ETRANSACTIONS_PLUGIN . '_version' ) != WC_ETRANSACTIONS_VERSION ) {
+	if ( get_site_option( WC_ETRANSACTIONS_PLUGIN . '_version' ) !== WC_ETRANSACTIONS_VERSION ) {
 		wc_etransactions_installation();
 	}
 }

@@ -4,7 +4,14 @@
  */
 
 class WC_Etransactions_Config {
+	/**
+	 * array
+	 */
 	private $_values;
+
+	/**
+	 * array
+	 */
 	private $_defaults = array(
 		'3ds_enabled' => 'always',
 		'icon'        => 'cbvisamcecb.png',
@@ -12,6 +19,8 @@ class WC_Etransactions_Config {
 		'amount'      => '',
 		'debug'       => 'no',
 		'delay'       => 0,
+		'step_1'      => '',
+		'step_2'      => '',
 		'environment' => 'TEST',
 		'hmackey'     => '4642EDBBDFF9790734E673A9974FC9DD4EF40AA2929925C40B3A95170FF5A578E7D2579D6074E28A78BD07D633C0E72A378AD83D4428B0F3741102B69AD1DBB0',
 		'identifier'  => 3262411,
@@ -56,6 +65,14 @@ class WC_Etransactions_Config {
 	public function getAmount() {
 		$value = $this->_getOption( 'amount' );
 		return empty( $value ) ? null : floatval( $value );
+	}
+
+	public function getStep1() {
+		return $this->_getOption( 'step_1' );
+	}
+
+	public function getStep2() {
+		return $this->_getOption( 'step_2' );
 	}
 
 	public function getAllowedIps() {

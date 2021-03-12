@@ -289,8 +289,16 @@ class WC_Etransactions {
 
 			case 'twotime':
 				// Compute each payment amount
-				$step                 = round( $orderAmount * $amountScale / 2 );
-				$firstStep            = ( $orderAmount * $amountScale ) - 1 * $step;
+
+				if ( ! empty( $this->_config->getStep1() ) && ! empty( $this->_config->getStep2() ) ) {
+					$step      = ( $orderAmount * $this->_config->getStep2() );
+					$firstStep = round( ( $orderAmount * $this->_config->getStep1() ) );
+				} else {
+
+					$step      = round( $orderAmount * $amountScale / 2 );
+					$firstStep = ( $orderAmount * $amountScale ) - 1 * $step;
+				}
+
 				$values['PBX_TOTAL']  = sprintf( '%03d', $firstStep );
 				$values['PBX_2MONT1'] = sprintf( '%03d', $step );
 
@@ -301,6 +309,7 @@ class WC_Etransactions {
 
 				// Force validity date of card
 				$values['PBX_DATEVALMAX'] = $now->format( 'ym' );
+
 				break;
 
 				break;
