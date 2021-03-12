@@ -290,7 +290,7 @@ class WC_Etransactions {
 			case 'twotime':
 				// Compute each payment amount
 
-				if ( ! empty( $this->_config->getStep1() ) && ! empty( $this->_config->getStep2() ) ) {
+				if ( ! empty( $this->_config->getStep1() ) && ! empty( $this->_config->getStep2() ) && 100 === $this->_config->getStep1() + $this->_config->getStep2() ) {
 					$step      = ( $orderAmount * $this->_config->getStep2() );
 					$firstStep = round( ( $orderAmount * $this->_config->getStep1() ) );
 				} else {
