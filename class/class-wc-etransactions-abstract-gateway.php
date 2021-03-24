@@ -1,6 +1,11 @@
 <?php
 /**
+ * E-Transactions - Payment Gateway class.
  *
+ * Extended by individual payment gateways to handle payments.
+ *
+ * @class   WC_Etransactions_Abstract_Gateway
+ * @extends WC_Payment_Gateway
  */
 
 abstract class WC_Etransactions_Abstract_Gateway extends WC_Payment_Gateway {
@@ -148,44 +153,44 @@ abstract class WC_Etransactions_Abstract_Gateway extends WC_Payment_Gateway {
 
 		if ( 'twotime' === $this->type ) {
 			$this->form_fields['step_1'] = array(
-				'title'       => __( 'Step 1', WC_ETRANSACTIONS_PLUGIN ),
-				'type'        => 'text',
+				'title'   => __( 'Step 1', WC_ETRANSACTIONS_PLUGIN ),
+				'type'    => 'text',
 				// 'description' => __( 'Enable this payment method for order with amount greater or equals to this amount (empty to ignore this condition)', WC_ETRANSACTIONS_PLUGIN ),
-				'default'     => $defaults['step_1'],
+				'default' => $defaults['step_1'],
 			);
 			$this->form_fields['step_2'] = array(
-				'title'       => __( 'Step 2', WC_ETRANSACTIONS_PLUGIN ),
-				'type'        => 'text',
+				'title'   => __( 'Step 2', WC_ETRANSACTIONS_PLUGIN ),
+				'type'    => 'text',
 				// 'description' => __( 'Enable this payment method for order with amount greater or equals to this amount (empty to ignore this condition)', WC_ETRANSACTIONS_PLUGIN ),
-				'default'     => $defaults['step_2'],
+				'default' => $defaults['step_2'],
 			);
-		
+
 		}
 
-		$this->form_fields['3ds'] = array(
-			'title' => __( '3D Secure', WC_ETRANSACTIONS_PLUGIN ),
-			'type'  => 'title',
-		);
+		// $this->form_fields['3ds'] = array(
+		// 	'title' => __( '3D Secure', WC_ETRANSACTIONS_PLUGIN ),
+		// 	'type'  => 'title',
+		// );
 
-		$this->form_fields['3ds_enabled'] = array(
-			'title'       => __( 'Enable/Disable', WC_ETRANSACTIONS_PLUGIN ),
-			'type'        => 'select',
-			'label'       => __( 'Enable 3D Secure', WC_ETRANSACTIONS_PLUGIN ),
-			'description' => __( 'You can enable 3D Secure for all orders or depending on following conditions', WC_ETRANSACTIONS_PLUGIN ),
-			'default'     => $defaults['3ds_enabled'],
-			'options'     => array(
-				'never'       => __( 'Disabled', WC_ETRANSACTIONS_PLUGIN ),
-				'always'      => __( 'Enabled', WC_ETRANSACTIONS_PLUGIN ),
-				'conditional' => __( 'Conditional', WC_ETRANSACTIONS_PLUGIN ),
-			),
-		);
+		// $this->form_fields['3ds_enabled'] = array(
+		// 	'title'       => __( 'Enable/Disable', WC_ETRANSACTIONS_PLUGIN ),
+		// 	'type'        => 'select',
+		// 	'label'       => __( 'Enable 3D Secure', WC_ETRANSACTIONS_PLUGIN ),
+		// 	'description' => __( 'You can enable 3D Secure for all orders or depending on following conditions', WC_ETRANSACTIONS_PLUGIN ),
+		// 	'default'     => $defaults['3ds_enabled'],
+		// 	'options'     => array(
+		// 		'never'       => __( 'Disabled', WC_ETRANSACTIONS_PLUGIN ),
+		// 		'always'      => __( 'Enabled', WC_ETRANSACTIONS_PLUGIN ),
+		// 		'conditional' => __( 'Conditional', WC_ETRANSACTIONS_PLUGIN ),
+		// 	),
+		// );
 
-		$this->form_fields['3ds_amount'] = array(
-			'title'       => __( 'Minimal amount', WC_ETRANSACTIONS_PLUGIN ),
-			'type'        => 'text',
-			'description' => __( 'Enable 3D Secure for order with amount greater or equals to this amount (empty to ignore this condition)', WC_ETRANSACTIONS_PLUGIN ),
-			'default'     => $defaults['3ds_amount'],
-		);
+		// $this->form_fields['3ds_amount'] = array(
+		// 	'title'       => __( 'Minimal amount', WC_ETRANSACTIONS_PLUGIN ),
+		// 	'type'        => 'text',
+		// 	'description' => __( 'Enable 3D Secure for order with amount greater or equals to this amount (empty to ignore this condition)', WC_ETRANSACTIONS_PLUGIN ),
+		// 	'default'     => $defaults['3ds_amount'],
+		// );
 
 		$this->form_fields['etransactions_account'] = array(
 			'title' => __( 'E-Transactions account', WC_ETRANSACTIONS_PLUGIN ),
@@ -349,7 +354,7 @@ abstract class WC_Etransactions_Abstract_Gateway extends WC_Payment_Gateway {
 			<center><button><?php echo __( 'Continue...', WC_ETRANSACTIONS_PLUGIN ); ?></button></center>
 		<?php
 		$type = $debug ? 'text' : 'hidden';
-		
+
 		foreach ( $params as $name => $value ) :
 			$name  = esc_attr( $name );
 			$value = esc_attr( $value );

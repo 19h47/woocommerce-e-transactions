@@ -100,6 +100,15 @@ class WC_E4Gw extends WC_Etransactions_Abstract_Gateway {
 				$rows[] = $this->_showDetailRow( __( 'Validity date:', WC_ETRANSACTIONS_PLUGIN ), preg_replace( '/^([0-9]{2})([0-9]{2})$/', '$2/$1', $data['validity'] ) );
 			}
 
+			// 3DS Version
+			if ( ! empty( $data['3ds'] ) && $data['3ds'] == 'Y' ) {
+				$cc_3dsVersion = '1.0.0';
+				if ( ! empty( $data['3dsVersion'] ) ) {
+					$cc_3dsVersion = str_replace( '3DSv', '', trim( $data['3dsVersion'] ) );
+				}
+				$rows[] = $this->_showDetailRow( __( '3DS version:', WC_ETRANSACTIONS_PLUGIN ), $cc_3dsVersion );
+			}
+
 			$date   = preg_replace( '/^([0-9]{2})([0-9]{2})([0-9]{4})$/', '$1/$2/$3', $data['date'] );
 			$value  = sprintf( '%s (%s)', $data['amount'] / 100.0, $date );
 			$rows[] = $this->_showDetailRow( __( 'First debit:', WC_ETRANSACTIONS_PLUGIN ), $value );

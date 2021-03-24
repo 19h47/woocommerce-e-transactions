@@ -3,7 +3,7 @@ Contributors: 19h47
 Tags: Payment Gateway, Orders, woocommerce, e-commerce, payment, E-Transactions
 Requires at least: 3.0.1
 Tested up to: 5.5.1
-Stable tag: 0.9.9.9.1
+Stable tag: 0.9.9.9.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 2.6
@@ -67,6 +67,12 @@ Contact [E-Transactions WordPress Support](mailto:support@e-transactions.fr "Wor
 6. Once successfully processed, the Payment transaction details appear in the order details
 
 == Changelog ==
+= 0.9.9.9.3 =
+Force 3DSv2 for all cards
+
+= 0.9.9.9.2 =
+Add 3DSv2 support
+
 = 0.9.8.9 =
 various fixes and alignments
 

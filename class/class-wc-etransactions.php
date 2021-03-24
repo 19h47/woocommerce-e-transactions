@@ -1,8 +1,9 @@
 <?php
 /**
- * WC E-Transactions
+ * E-Transactions - Main class.
+ *
+ * @class   WC_Etransactions
  */
-
 class WC_Etransactions {
 	private $_config;
 	private $_currencyDecimals = array(
@@ -363,32 +364,13 @@ class WC_Etransactions {
 				throw new Exception( $message );
 		}
 
-		// 3D Secure
-		switch ( $this->_config->get3DSEnabled() ) {
-			case 'never':
-				$enable3ds = false;
-				break;
-			case null:
-			case 'always':
-				$enable3ds = true;
-				break;
-			case 'conditional':
-				$tdsAmount = $this->_config->get3DSAmount();
-				$enable3ds = empty( $tdsAmount ) || ( $orderAmount >= $tdsAmount );
-				break;
-			default:
-				$message = __( 'Unexpected 3-D Secure status %s', WC_ETRANSACTIONS_PLUGIN );
-				$message = sprintf( $message, $this->_config->get3DSEnabled() );
-				throw new Exception( $message );
-		}
-		// Enable is the default behaviour
-		if ( ! $enable3ds ) {
-			$values['PBX_3DS'] = 'N';
-		}
-
 		// E-Transactions => Magento
 		$values['PBX_RETOUR'] = 'M:M;R:R;T:T;A:A;B:B;C:C;D:D;E:E;F:F;G:G;I:I;J:J;N:N;O:O;P:P;Q:Q;S:S;W:W;Y:Y;K:K';
 		$values['PBX_RUF1']   = 'POST';
+
+		// 3DSv2 parameters
+		$values['PBX_SHOPPINGCART'] = $this->getXmlShoppingCartInformation( $order );
+		$values['PBX_BILLING']      = $this->getXmlBillingInformation( $order );
 
 		// Choose correct language
 		$lang = get_locale();
@@ -447,6 +429,125 @@ class WC_Etransactions {
 		return $name;
 	}
 
+	/**
+	 * Format a value to respect specific rules
+	 *
+	 * @param string $value
+	 * @param string $type
+	 * @param int $maxLength
+	 * @return string
+	 */
+	protected function formatTextValue( $value, $type, $maxLength = null ) {
+		/*
+		AN : Alphanumerical without special characters
+		ANP : Alphanumerical with spaces and special characters
+		ANS : Alphanumerical with special characters
+		N : Numerical only
+		A : Alphabetic only
+		*/
+
+		switch ( $type ) {
+			default:
+			case 'AN':
+				$value = remove_accents( $value );
+				break;
+			case 'ANP':
+				$value = remove_accents( $value );
+				$value = preg_replace( '/[^-. a-zA-Z0-9]/', '', $value );
+				break;
+			case 'ANS':
+				break;
+			case 'N':
+				$value = preg_replace( '/[^0-9.]/', '', $value );
+				break;
+			case 'A':
+				$value = remove_accents( $value );
+				$value = preg_replace( '/[^A-Za-z]/', '', $value );
+				break;
+		}
+		// Remove carriage return characters
+		$value = trim( preg_replace( "/\r|\n/", '', $value ) );
+
+		// Cut the string when needed
+		if ( ! empty( $maxLength ) && is_numeric( $maxLength ) && $maxLength > 0 ) {
+			if ( function_exists( 'mb_strlen' ) ) {
+				if ( mb_strlen( $value ) > $maxLength ) {
+					$value = mb_substr( $value, 0, $maxLength );
+				}
+			} elseif ( strlen( $value ) > $maxLength ) {
+				$value = substr( $value, 0, $maxLength );
+			}
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Import XML content as string and use DOMDocument / SimpleXML to validate, if available
+	 *
+	 * @param string $xml
+	 * @return string
+	 */
+	protected function exportToXml( $xml ) {
+		if ( class_exists( 'DOMDocument' ) ) {
+			$doc = new DOMDocument();
+			$doc->loadXML( $xml );
+			$xml = $doc->saveXML();
+		} elseif ( function_exists( 'simplexml_load_string' ) ) {
+			$xml = simplexml_load_string( $xml )->asXml();
+		}
+
+		$xml = trim( preg_replace( '/(\s*)(' . preg_quote( '<?xml version="1.0" encoding="utf-8"?>' ) . ')(\s*)/', '$2', $xml ) );
+		$xml = trim( preg_replace( "/\r|\n/", '', $xml ) );
+
+		return $xml;
+	}
+
+	/**
+	 * Generate XML value for PBX_BILLING parameter
+	 *
+	 * @param WC_Order $order
+	 * @return string
+	 */
+	public function getXmlBillingInformation( WC_Order $order ) {
+		$firstName    = $this->formatTextValue( $order->get_billing_first_name(), 'ANP', 30 );
+		$lastName     = $this->formatTextValue( $order->get_billing_last_name(), 'ANP', 30 );
+		$addressLine1 = $this->formatTextValue( $order->get_billing_address_1(), 'ANS', 50 );
+		$addressLine2 = $this->formatTextValue( $order->get_billing_address_2(), 'ANS', 50 );
+		$zipCode      = $this->formatTextValue( $order->get_billing_postcode(), 'ANS', 16 );
+		$city         = $this->formatTextValue( $order->get_billing_city(), 'ANS', 50 );
+		$countryCode  = (int) WC_Etransactions_Iso3166_Country::getNumericCode( $order->get_billing_country() );
+
+		$xml = sprintf(
+			'<?xml version="1.0" encoding="utf-8"?><Billing><Address><FirstName>%s</FirstName><LastName>%s</LastName><Address1>%s</Address1><Address2>%s</Address2><ZipCode>%s</ZipCode><City>%s</City><CountryCode>%d</CountryCode></Address></Billing>',
+			$firstName,
+			$lastName,
+			$addressLine1,
+			$addressLine2,
+			$zipCode,
+			$city,
+			$countryCode
+		);
+
+		return $this->exportToXml( $xml );
+	}
+
+	/**
+	 * Generate XML value for PBX_SHOPPINGCART parameter
+	 *
+	 * @param WC_Order $order
+	 * @return string
+	 */
+	public function getXmlShoppingCartInformation( WC_Order $order ) {
+		$totalQuantity = 0;
+		foreach ( $order->get_items() as $item ) {
+			$totalQuantity += (int) $item->get_quantity();
+		}
+		// totalQuantity must be less or equal than 99
+		$totalQuantity = min( $totalQuantity, 99 );
+
+		return sprintf( '<?xml version="1.0" encoding="utf-8"?><shoppingcart><total><totalQuantity>%d</totalQuantity></total></shoppingcart>', $totalQuantity );
+	}
 
 
 	public function getClientIp() {
@@ -620,7 +721,6 @@ class WC_Etransactions {
 
 	/**
 	 * Load order from the $token
-	 *
 	 * @param string $token Token (@see tokenizeOrder)
 	 * @return Mage_Sales_Model_Order
 	 */

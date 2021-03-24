@@ -13,9 +13,9 @@ class WC_Etransactions_Config {
 	 * array
 	 */
 	private $_defaults = array(
-		'3ds_enabled' => 'always',
+		// '3ds_enabled' => 'always',
 		'icon'        => 'cbvisamcecb.png',
-		'3ds_amount'  => '',
+		// '3ds_amount'  => '',
 		'amount'      => '',
 		'debug'       => 'no',
 		'delay'       => 0,
@@ -53,14 +53,14 @@ class WC_Etransactions_Config {
 		return null;
 	}
 
-	public function get3DSEnabled() {
-		return $this->_getOption( '3ds_enabled' );
-	}
+	// public function get3DSEnabled() {
+	// 	return $this->_getOption( '3ds_enabled' );
+	// }
 
-	public function get3DSAmount() {
-		$value = $this->_getOption( '3ds_amount' );
-		return empty( $value ) ? null : floatval( $value );
-	}
+	// public function get3DSAmount() {
+	// 	$value = $this->_getOption( '3ds_amount' );
+	// 	return empty( $value ) ? null : floatval( $value );
+	// }
 
 	public function getAmount() {
 		$value = $this->_getOption( 'amount' );

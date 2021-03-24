@@ -3,7 +3,7 @@
  * Plugin Name: E-Transactions
  * Plugin URI:        https://github.com/19h47/woocommerce-e-transactions
  * Description: E-Transactions gateway payment plugins for WooCommerce
- * Version: 0.9.9.9.1
+ * Version: 0.9.9.9.3
  * Author: 19h47
  * Author URI: https://19h47.fr
  * Text Domain: woocommerce-e-transactions
@@ -22,7 +22,8 @@ function wooCommerceActiveETwp() {
 	if ( ! class_exists( 'WC_Payment_Gateway' ) ) {
 		return false;
 	}
-		return true;
+
+	return true;
 }
 // Ensure WooCommerce is active
 
@@ -32,7 +33,7 @@ if ( defined( 'WC_ETRANSACTIONS_PLUGIN' ) ) {
 		die( __( 'Previous plugin already installed. deactivate the previous one first.', WC_ETRANSACTIONS_PLUGIN ) );
 }
 	defined( 'WC_ETRANSACTIONS_PLUGIN' ) or define( 'WC_ETRANSACTIONS_PLUGIN', 'woocommerce-e-transactions' );
-	defined( 'WC_ETRANSACTIONS_VERSION' ) or define( 'WC_ETRANSACTIONS_VERSION', '0.9.9.9.1' );
+	defined( 'WC_ETRANSACTIONS_VERSION' ) or define( 'WC_ETRANSACTIONS_VERSION', '0.9.9.9.3' );
 	defined( 'WC_ETRANSACTIONS_KEY_PATH' ) or define( 'WC_ETRANSACTIONS_KEY_PATH', ABSPATH . '/kek.php' );
 
 function wc_etransactions_installation() {
@@ -64,13 +65,14 @@ function wc_etransactions_installation() {
 }
 function wc_etransactions_initialization() {
 	if ( ! wooCommerceActiveETwp() ) {
-		return ( 'Woocommerce not Active' );
+		return ( __( 'Woocommerce not Active', WC_ETRANSACTIONS_PLUGIN ) );
 	}
 	$class = 'WC_Etransactions_Abstract_Gateway';
 
 	if ( ! class_exists( $class ) ) {
 		require_once dirname( __FILE__ ) . '/class/class-wc-etransactions-config.php';
 		require_once dirname( __FILE__ ) . '/class/class-wc-etransactions-iso4217currency.php';
+		require_once dirname( __FILE__ ) . '/class/class-wc-etransactions-iso3166-country.php';
 		require_once dirname( __FILE__ ) . '/class/class-wc-etransactions.php';
 		require_once dirname( __FILE__ ) . '/class/class-wc-etransactions-abstract-gateway.php';
 		require_once dirname( __FILE__ ) . '/class/class-wc-etransactions-standard-gateway.php';

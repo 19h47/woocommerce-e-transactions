@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * E-Transactions - ISO 4217 Currency class.
+ *
+ * @class   WC_Etransactions_Iso4217Currency
+ */
 class WC_Etransactions_Iso4217Currency {
 
 	private static $_mapping = array(
@@ -182,9 +187,9 @@ class WC_Etransactions_Iso4217Currency {
 		'ZWL' => '932',
 	);
 
-	public static function getIsoCode($code, $default = null) {
-		if (isset(WC_Etransactions_Iso4217Currency::$_mapping[$code])) {
-			return WC_Etransactions_Iso4217Currency::$_mapping[$code];
+	public static function getIsoCode( $code, $default = null ) {
+		if ( isset( WC_Etransactions_Iso4217Currency::$_mapping[ $code ] ) ) {
+			return WC_Etransactions_Iso4217Currency::$_mapping[ $code ];
 		}
 		return $default;
 	}
